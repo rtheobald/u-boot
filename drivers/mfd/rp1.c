@@ -123,12 +123,12 @@ static const struct dm_pci_ops rp1_pcie_ops = {
 };
 
 U_BOOT_DRIVER(rp1_driver) = {
-	.name			= RP1_DRIVER_NAME,
-	.id			= UCLASS_PCI_GENERIC,
+	.name				= RP1_DRIVER_NAME,
+	.id					= UCLASS_PCI_GENERIC,
 	.probe			= rp1_probe,
-	.bind			= rp1_bind,
-	.priv_auto		= sizeof(struct rp1_dev),
-	.ops			= &rp1_pcie_ops,
+	.bind				= rp1_bind,
+	.priv_auto	= sizeof(struct rp1_dev),
+	.ops				= &rp1_pcie_ops,
 };
 
 U_BOOT_PCI_DEVICE(rp1_driver, dev_id_table);
