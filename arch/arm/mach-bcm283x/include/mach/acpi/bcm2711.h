@@ -54,6 +54,7 @@
 #define  MISC_CTRL_CFG_READ_UR_MODE_MASK          0x2000
 #define  MISC_CTRL_MAX_BURST_SIZE_MASK            0x300000
 #define  MISC_CTRL_MAX_BURST_SIZE_128             0x0
+#define  MISC_CTRL_MAX_BURST_SIZE_128_2712        0x100000
 #define  MISC_CTRL_SCB0_SIZE_MASK                 0xf8000000
 
 #define PCIE_MISC_CPU_2_PCIE_MEM_WIN0_LO          0x400c
@@ -65,6 +66,10 @@
 		PCIE_MISC_CPU_2_PCIE_MEM_WIN0_HI + ((win) * 4)
 #define PCIE_MISC_RC_BAR1_CONFIG_LO               0x402c
 #define  RC_BAR1_CONFIG_LO_SIZE_MASK                0x1f
+
+#define PCIE_MISC_PCIE_CTRL                       0x4064
+#define PCIE_MISC_PCIE_CTRL_PCIE_PERSTB_MASK         0x4
+
 #define PCIE_MISC_RC_BAR2_CONFIG_LO               0x4034
 #define  RC_BAR2_CONFIG_LO_SIZE_MASK                0x1f
 #define PCIE_MISC_RC_BAR2_CONFIG_HI               0x4038
@@ -93,7 +98,8 @@
 #define PCIE_MEM_WIN0_LIMIT_HI(win)	\
 	 PCIE_MISC_CPU_2_PCIE_MEM_WIN0_LIMIT_HI + ((win) * 8)
 
-#define PCIE_MISC_HARD_PCIE_HARD_DEBUG            0x4204
+#define PCIE_MISC_HARD_PCIE_HARD_DEBUG(pcie)	\
+	((pcie)->pcie_cfg->offsets[PCIE_HARD_DEBUG])
 #define  PCIE_HARD_DEBUG_SERDES_IDDQ_MASK         0x08000000
 
 #define PCIE_INTR2_CPU_STATUS                 0x4300
@@ -106,10 +112,15 @@
 #define PCIE_MSI_INTR2_CLR                    0x4508
 #define PCIE_MSI_INTR2_MASK_SET               0x4510
 
-#define PCIE_RGR1_SW_INIT_1                   0x9210
-#define PCIE_EXT_CFG_INDEX                    0x9000
+#define PCIE_RGR1_SW_INIT_1(pcie)	\
+	((pcie)->pcie_cfg->offsets[RGR1_SW_INIT_1])
+
 /* A small window pointing at the ECAM of the device selected by CFG_INDEX */
-#define PCIE_EXT_CFG_DATA                     0x8000
+#define PCIE_EXT_CFG_DATA(pcie)	\
+	((pcie)->pcie_cfg->offsets[EXT_CFG_DATA])
+
+#define PCIE_EXT_CFG_INDEX(pcie)	\
+	((pcie)->pcie_cfg->offsets[EXT_CFG_INDEX])
 
 #define PCIE_RC_CFG_VENDOR_VENDOR_SPECIFIC_REG1_ENDIAN_MODE_BAR2_MASK 0xc
 #define PCIE_RC_CFG_PRIV1_ID_VAL3_CLASS_CODE_MASK                     0xffffff
@@ -124,6 +135,7 @@
 
 #define PCIE_RGR1_SW_INIT_1_INIT_MASK                           0x2
 #define PCIE_RGR1_SW_INIT_1_PERST_MASK                          0x1
+#define PCIE_RGR1_SW_INIT_1_PERSTB_MASK                         0x4
 
 #define PCIE_MISC_HARD_PCIE_HARD_DEBUG_SERDES_IDDQ_MASK         0x08000000
 
