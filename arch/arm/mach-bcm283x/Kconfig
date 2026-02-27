@@ -56,7 +56,7 @@ config BCM2711_64B
 	select BLOBLIST_ALLOC if GENERATE_ACPI_TABLE
 	select BLOBLIST_TABLES if GENERATE_ACPI_TABLE
 
-+config BCM2712
+config BCM2712
   bool "Broadcom BCM2712 SoC support"
 	select LINUX_KERNEL_IMAGE_HEADER
   depends on ARCH_BCM283X
