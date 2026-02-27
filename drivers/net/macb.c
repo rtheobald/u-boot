@@ -1150,7 +1150,7 @@ static void _macb_eth_initialize(struct macb_device *macb, struct udevice *dev)
 					     MACB_RX_RING_SIZE,
 					     &macb->rx_buffer_dma);
 
-	macb->rx_buffer_dma = dev_phys_to_us(dev, (ulong)macb->rx_buffer);
+	macb->rx_buffer_dma = dev_phys_to_bus(dev, (ulong)macb->rx_buffer);
 
 	macb->rx_ring = dma_alloc_coherent(MACB_RX_DMA_DESC_SIZE,
 					   &macb->rx_ring_dma);
@@ -1165,7 +1165,7 @@ static void _macb_eth_initialize(struct macb_device *macb, struct udevice *dev)
 					   &macb->dummy_desc_dma);
 
 	macb->dummy_desc_dma = dev_phys_to_bus(dev, (ulong)macb->dummy_desc);
-+
+
 	/*
 	 * Do some basic initialization so that we at least can talk
 	 * to the PHY
