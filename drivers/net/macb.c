@@ -369,7 +369,7 @@ static void macb_set_addr(struct macb_device *macb, struct macb_dma_desc *desc,
 static int _macb_send(struct macb_device *macb, const char *name, void *packet,
 		      int length)
 {
-+	unsigned long paddr, dmaaddr, ctrl;
+	unsigned long paddr, dmaaddr, ctrl;
 	unsigned int tx_head = macb->tx_head;
 	int i;
 
