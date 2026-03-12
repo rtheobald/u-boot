@@ -120,22 +120,28 @@ static void console_record_puts(const char *s)
 
 static int console_record_getc(void)
 {
-	if (!(gd->flags & GD_FLG_RECORD))
+	#if defined(CONFIG_DISABLE_CONSOLE_INPUT)
 		return -1;
-	if (!gd->console_in.start)
-		return -1;
+  #else
+		if (!(gd->flags & GD_FLG_RECORD))
+			return -1;
+		if (!gd->console_in.start)
+			return -1;
 
-	return membuf_getbyte((struct membuf *)&gd->console_in);
+		return membuf_getbyte((struct membuf *)&gd->console_in);
+  #endif
 }
 
 static int console_record_tstc(void)
 {
-	if (!(gd->flags & GD_FLG_RECORD))
-		return 0;
-	if (gd->console_in.start) {
-		if (membuf_peekbyte((struct membuf *)&gd->console_in) != -1)
-			return 1;
-	}
+	#if !defined(CONFIG_DISABLE_CONSOLE_INPUT)
+		if (!(gd->flags & GD_FLG_RECORD))
+			return 0;
+		if (gd->console_in.start) {
+			if (membuf_peekbyte((struct membuf *)&gd->console_in) != -1)
+				return 1;
+		}
+  #endif
 	return 0;
 }
 #else
@@ -146,16 +152,17 @@ static void console_record_putc(char c)
 static void console_record_puts(const char *s)
 {
 }
+	#if !defined(CONFIG_DISABLE_CONSOLE_INPUT)
+		static int console_record_getc(void)
+		{
+			return -1;
+		}
 
-static int console_record_getc(void)
-{
-	return -1;
-}
-
-static int console_record_tstc(void)
-{
-	return 0;
-}
+		static int console_record_tstc(void)
+		{
+			return 0;
+		}
+	#endif
 #endif
 
 #if CONFIG_IS_ENABLED(SYS_CONSOLE_IS_IN_ENV)
@@ -602,45 +609,54 @@ int fprintf(int file, const char *fmt, ...)
 
 int getchar(void)
 {
-	int ch;
-
-	if (IS_ENABLED(CONFIG_DISABLE_CONSOLE) && (gd->flags & GD_FLG_DISABLE_CONSOLE))
+	#if defined(CONFIG_DISABLE_CONSOLE_INPUT)
 		return 0;
+	#else
+		int ch;
 
-	if (!(gd->flags & GD_FLG_HAVE_CONSOLE))
-		return 0;
+		if (IS_ENABLED(CONFIG_DISABLE_CONSOLE) && (gd->flags & GD_FLG_DISABLE_CONSOLE))
+			return 0;
 
-	ch = console_record_getc();
-	if (ch != -1)
-		return ch;
+		if (!(gd->flags & GD_FLG_HAVE_CONSOLE))
+			return 0;
 
-	if (gd->flags & GD_FLG_DEVINIT) {
-		/* Get from the standard input */
-		return fgetc(stdin);
-	}
+		ch = console_record_getc();
+		if (ch != -1)
+			return ch;
 
-	/* Send directly to the handler */
-	return serial_getc();
+		if (gd->flags & GD_FLG_DEVINIT) {
+			/* Get from the standard input */
+			return fgetc(stdin);
+		}
+
+		/* Send directly to the handler */
+		return serial_getc();
+	#endif
 }
 
 int tstc(void)
 {
-	if (IS_ENABLED(CONFIG_DISABLE_CONSOLE) && (gd->flags & GD_FLG_DISABLE_CONSOLE))
+
+	#if defined(CONFIG_DISABLE_CONSOLE_INPUT)
 		return 0;
+	#else
+		if (IS_ENABLED(CONFIG_DISABLE_CONSOLE) && (gd->flags & GD_FLG_DISABLE_CONSOLE))
+			return 0;
 
-	if (!(gd->flags & GD_FLG_HAVE_CONSOLE))
-		return 0;
+		if (!(gd->flags & GD_FLG_HAVE_CONSOLE))
+			return 0;
 
-	if (console_record_tstc())
-		return 1;
+		if (console_record_tstc())
+			return 1;
 
-	if (gd->flags & GD_FLG_DEVINIT) {
-		/* Test the standard input */
-		return ftstc(stdin);
-	}
+		if (gd->flags & GD_FLG_DEVINIT) {
+			/* Test the standard input */
+			return ftstc(stdin);
+		}
 
-	/* Send directly to the handler */
-	return serial_tstc();
+		/* Send directly to the handler */
+		return serial_tstc();
+	#endif
 }
 
 #define PRE_CONSOLE_FLUSHPOINT1_SERIAL			0
@@ -891,17 +907,19 @@ static int ctrlc_disabled = 0;	/* see disable_ctrl() */
 static int ctrlc_was_pressed = 0;
 int ctrlc(void)
 {
-	if (!ctrlc_disabled && (gd->flags & GD_FLG_HAVE_CONSOLE)) {
-		if (tstc()) {
-			switch (getchar()) {
-			case 0x03:		/* ^C - Control C */
-				ctrlc_was_pressed = 1;
-				return 1;
-			default:
-				break;
+	#if ! defined(CONFIG_DISABLE_CONSOLE_INPUT)
+		if (!ctrlc_disabled && (gd->flags & GD_FLG_HAVE_CONSOLE)) {
+			if (tstc()) {
+				switch (getchar()) {
+				case 0x03:		/* ^C - Control C */
+					ctrlc_was_pressed = 1;
+					return 1;
+				default:
+					break;
+				}
 			}
 		}
-	}
+	#endif
 
 	return 0;
 }

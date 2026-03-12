@@ -145,6 +145,16 @@ config SERIAL_PUTS
 	  serial drivers do not need this config to print efficiently. If
 	  unsure, say N.
 
+config DISABLE_SERIAL_INPUT
+	bool "Disable serial input"
+	help
+	  What it says, basically. Disable input to secure console during boot
+
+config DISABLE_CONSOLE_INPUT
+	bool "Disable console input"
+	help
+	  What it says, basically. Disable input to secure console during boot
+
 config SERIAL_SEARCH_ALL
 	bool "Search for serial devices after default one failed"
 	depends on DM_SERIAL

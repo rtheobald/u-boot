@@ -49,14 +49,10 @@ static int pl01x_putc(struct pl01x_regs *regs, char c)
 
 static int pl01x_getc(struct pl01x_regs *regs)
 {
-	#if defined(CONFIG_DISABLE_SERIAL_INPUT)
-		return -EAGAIN;
-  #endif
-
 	unsigned int data;
 
 	/* Wait until there is data in the FIFO */
-	if (readl(&regs->fr) & UART_PL01x_FR_RXFE)
+	// if (readl(&regs->fr) & UART_PL01x_FR_RXFE)
 		return -EAGAIN;
 
 	data = readl(&regs->dr);
@@ -73,10 +69,7 @@ static int pl01x_getc(struct pl01x_regs *regs)
 
 static int pl01x_tstc(struct pl01x_regs *regs)
 {
-	#if defined(CONFIG_DISABLE_SERIAL_INPUT)
-		return 0;
-  #endif
-
+	return 0;
 	schedule();
 	return !(readl(&regs->fr) & UART_PL01x_FR_RXFE);
 }
@@ -358,6 +351,8 @@ int pl01x_serial_putc(struct udevice *dev, const char ch)
 
 int pl01x_serial_pending(struct udevice *dev, bool input)
 {
+  return 0;
+
 	struct pl01x_priv *priv = dev_get_priv(dev);
 	unsigned int fr = readl(&priv->regs->fr);
 

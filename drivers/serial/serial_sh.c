@@ -126,12 +126,17 @@ static int serial_rx_fifo_level(struct uart_port *port)
 
 static int sh_serial_tstc_generic(struct uart_port *port)
 {
-	if (sci_in(port, SCxSR) & SCIF_ERRORS) {
-		handle_error(port);
-		return 0;
-	}
 
-	return serial_rx_fifo_level(port) ? 1 : 0;
+	#if defined(CONFIG_DISABLE_SERIAL_INPUT)
+		return 0;
+  #else
+		if (sci_in(port, SCxSR) & SCIF_ERRORS) {
+			handle_error(port);
+			return 0;
+		}
+
+		return serial_rx_fifo_level(port) ? 1 : 0;
+	#endif
 }
 
 static int serial_getc_check(struct uart_port *port)
@@ -152,6 +157,9 @@ static int serial_getc_check(struct uart_port *port)
 
 static int sh_serial_getc_generic(struct uart_port *port)
 {
+	#if defined(CONFIG_DISABLE_SERIAL_INPUT)
+		return -EAGAIN;
+  #else
 	unsigned short status;
 	char ch;
 
@@ -170,6 +178,7 @@ static int sh_serial_getc_generic(struct uart_port *port)
 		handle_error(port);
 
 	return ch;
+	#endif
 }
 
 #if CONFIG_IS_ENABLED(DM_SERIAL)
